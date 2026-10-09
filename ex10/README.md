@@ -19,7 +19,7 @@ This program demonstrates how to retrieve and display file metadata in the Linux
 | File Timestamps | Records when the file was last accessed, modified, or its metadata was changed. |
 
 ## SOURCE CODE :
-**File :** [file_info.c](https://github.com/Balakrishna-0907/osLab/blob/6bf0c00de53bfd283a81a41ff60216a7f600ff74/ex10/file_info.c)
+**File :** [file_info.c](https://github.com/Balakrishna0907/osLab/blob/7afc55a2b13e15df5588c242bae28788cdc4197a/ex10/file_info.c)
 ## COMPILATION :
 
 ```bash
