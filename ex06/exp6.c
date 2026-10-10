@@ -1,83 +1,53 @@
-#include<stdio.h>
-#include<fcntl.h> //O_CREAT, O_RDWR
-#include<sys/mman.h> // Memory mapping operations like shm_open( ), mmap( )
-#include<unistd.h> // ftruncate(), fork(), sleep(), close(), shm_unlink()
-#include<sys/types.h> // pid_t
-#include<sys/wait.h> // Process waiting and synchronization wait(), waitpid(), etc
+#include <stdio.h>
+#include <sys/types.h> // pid_t
+#include <unistd.h> // Required for pipe(), fork(), read(), write(), and close()
+#include <string.h> // Required for strlen() to measure message size
 int main()
 {
-	  // Name of the shared memory object
-	  const char *name = "/my_shm";
+	/* fd[2] array holds two file descriptors: fd[0] for reading, fd[1] for writing */
+	int fd[2];
+	/* pid_t is a data type used to represent process IDs */
+	pid_t pid;
+	char message[] = "Hello from Parent Process";
+	char buffer[100];
+	// Create pipe, fd[0] -> Reading end, fd[1] -> Writing end
+	if (pipe(fd) == -1)
+	{
+		printf("Pipe creation failed\n");
+		return 1;
+	}
+	/* fork() system call: Clones the calling process to create a new child process.
+	* Returns 0 to the child process, and the child's actual PID to the parent */
+	pid = fork();
 
-	  // Size of the shared memory block (in bytes)
-	  const int SIZE = 4096;
+	/* Checks if fork() failed to allocate/spawn a new process */
+	if (pid < 0)
+	{
+		printf("Process creation failed\n");
+		return 1;
+	}
 	
-	  int shm_fd; //shared memory identifier
-	  void *ptr; //ptr to shared memory address
-
-	  /*     1. Create the shared memory object
-			 O_CREAT: Create object if it doesn't exist
-			 O_RDWR: Open for reading and writing
-			 0666: Read/Write permissions for User, Group, and Others      */
-
-	  shm_fd = shm_open(name, O_CREAT | O_RDWR, 0666);
-
-	  if (shm_fd == -1)
-	  {
-			 perror("shm_open failed"); //display an error message
-			 return 1;
-	  }
-
-
-	  //Configure the size of the shared memory segment
-	  if (ftruncate(shm_fd, SIZE) == -1)
-	  {
-			 perror("ftruncate failed");
-			 return 1;
-	  }
-
-	  //Map the shared memory object into memory
-	  ptr = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
-	  if (ptr == MAP_FAILED)
-	  {
-			 perror("mmap failed");
-			 return 1;
-	  }
-
-	  //Fork a child process
-	  pid_t pid = fork(); //process id
-
-	  if (pid < 0)
-	  {
-			 perror("Fork failed");
-			 return 1;
-	  }
-	  else if (pid == 0)
-	  {
-			 //Child process reads the data from the shared memory segment
-			 sleep(1); // Simple delay to ensure the parent writes first
-			 printf("\nChild: Read data from shared memory: \"%s\"\n", (char *)ptr);
-			 munmap(ptr, SIZE); // Clean up memory mapping in child
-			 close(shm_fd);
-	  }
-      else
-	  {
-			 //Parent process writes data into the shared memory segment
-			 const char *message = "Hello from the Shared Memory!";
-
-			 // Copying data into the memory mapped region
-			 sprintf(ptr, "%s", message);
-	
-			 printf("Parent: Wrote data to shared memory: \"%s\"\n", message);
-	
-			 // Wait for child to finish reading before cleaning up resource
-			 wait(NULL);
-
-			 munmap(ptr, SIZE); // Clean up and release shared memory resources
-	
-			 close(shm_fd);
-
-			 shm_unlink(name); // Deletes the shared memory segment from system
-	  }
-	  return 0;
+	// Child Process: Reads data from pipe
+	else if (pid == 0)
+	{
+		// Unused descriptors should be closed; child only reads, so it closes the write end (fd[1])
+		close(fd[1]);
+		
+		
+		read(fd[0], buffer, sizeof(buffer));
+		printf("\nChild received message:\n");
+		printf("%s\n", buffer);
+		close(fd[0]);
+	}
+	// Parent Process: Writes data into pipe
+	else
+	{
+		close(fd[0]);
+		/* write() system call: Pushes the message data string into the write end of the pipe (fd[1]).
+		'strlen(message) + 1' ensures the null terminator ('\0') is also sent through the pipe. */
+		write(fd[1], message, strlen(message) + 1);
+		printf("Parent sent message\n");
+		close(fd[1]);
+	}
+	return 0;
 }
