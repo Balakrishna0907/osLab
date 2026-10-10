@@ -47,4 +47,4 @@ gcc signal_raise.c -o signal_raise
 ```
 
 ## OUTPUT :
-![Output for Experiment 5](https://github.com/Balakrishna-0907/osLab/blob/8cbceaa4f051e2760f1da7a4268b96e30cbf1e91/ex05/output.png)
+![Output for Experiment 5](https://github.com/Balakrishna0907/osLab/blob/fabc5bfba3d310189a51e9c5680dc8c47f6b0ec3/ex05/output.png)
