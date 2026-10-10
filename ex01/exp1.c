@@ -1,20 +1,21 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> //system( )
+
 
 int main()
 {
 	printf("Current Directory\n");
-	system("pwd");
+	system("pwd"); //to execute an operating system command
 
-	printf("\nFiles details\n");
-	system("ls -l"); 
+	printf("\nFiles\n");
+	system("ls -l");
 
 	printf("\nCreating Directory\n");
 	system("mkdir Demo");
 
 	printf("\nListing Files Again\n");
 	system("ls");
-
+	
 	printf("\nRemoving Directory\n");
 	system("rmdir Demo");
 
