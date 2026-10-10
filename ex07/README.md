@@ -36,4 +36,4 @@ gcc exp7.c -o exp7
 ```
 
 ## OUTPUT :
-![Output for Experiment 6](https://github.com/Balakrishna-0907/osLab/blob/8b7aba9aa1d69a8dde0b0be80a911b4d695bec61/ex07/output.png)
+![Output for Experiment 6](https://github.com/Balakrishna0907/osLab/blob/5fff474ac7090046dc4c6a2b4c071ee92e4da977/ex07/output.png)
